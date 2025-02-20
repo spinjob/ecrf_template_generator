@@ -27,119 +27,141 @@ export default function FormField({ field }: FormFieldProps) {
     switch (field.type) {
       case 'text':
         return (
-          <Input
-            {...form.register(field.id)}
-            placeholder={`Enter ${field.label.toLowerCase()}`}
-          />
+          <FormControl>
+            <Input
+              {...form.register(field.id)}
+              placeholder={`Enter ${field.label.toLowerCase()}`}
+            />
+          </FormControl>
         );
 
       case 'number':
       case 'decimal':
         return (
-          <Input
-            type="number"
-            {...form.register(field.id, {
-              valueAsNumber: true,
-            })}
-            step={field.validation?.decimalPlaces ? `0.${'0'.repeat(field.validation.decimalPlaces-1)}1` : '1'}
-            min={field.validation?.min}
-            max={field.validation?.max}
-          />
+          <FormControl>
+            <Input
+              type="number"
+              {...form.register(field.id, {
+                valueAsNumber: true,
+              })}
+              step={field.validation?.decimalPlaces ? `0.${'0'.repeat(field.validation.decimalPlaces-1)}1` : '1'}
+              min={field.validation?.min}
+              max={field.validation?.max}
+            />
+          </FormControl>
         );
 
       case 'date':
         return (
-          <Input
-            type="date"
-            {...form.register(field.id)}
-            min={field.validation?.minDate}
-            max={field.validation?.maxDate}
-          />
+          <FormControl>
+            <Input
+              type="date"
+              {...form.register(field.id)}
+              min={field.validation?.minDate}
+              max={field.validation?.maxDate}
+            />
+          </FormControl>
         );
 
       case 'textarea':
         return (
-          <Textarea
-            {...form.register(field.id)}
-            placeholder={`Enter ${field.label.toLowerCase()}`}
-            maxLength={field.validation?.maxLength}
-          />
+          <FormControl>
+            <Textarea
+              {...form.register(field.id)}
+              placeholder={`Enter ${field.label.toLowerCase()}`}
+              maxLength={field.validation?.maxLength}
+            />
+          </FormControl>
         );
 
       case 'radio':
         return (
-          <RadioGroup
-            onValueChange={(value) => form.setValue(field.id, value)}
-            defaultValue={form.getValues(field.id)}
-          >
-            {field.options?.map((option) => (
-              <div key={option.value} className="flex items-center space-x-2">
-                <RadioGroupItem value={option.value} id={`${field.id}-${option.value}`} />
-                <FormLabel htmlFor={`${field.id}-${option.value}`}>{option.label}</FormLabel>
-              </div>
-            ))}
-          </RadioGroup>
+          <FormControl>
+            <RadioGroup
+              onValueChange={(value) => form.setValue(field.id, value)}
+              defaultValue={form.getValues(field.id)}
+            >
+              {field.options?.map((option) => (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <RadioGroupItem value={option.value} id={`${field.id}-${option.value}`} />
+                  <FormLabel htmlFor={`${field.id}-${option.value}`}>{option.label}</FormLabel>
+                </div>
+              ))}
+            </RadioGroup>
+          </FormControl>
         );
 
       case 'checkbox':
-        return field.options?.map((option) => (
-          <div key={option.value} className="flex items-center space-x-2">
-            <Checkbox
-              id={`${field.id}-${option.value}`}
-              {...form.register(`${field.id}.${option.value}`)}
-            />
-            <FormLabel htmlFor={`${field.id}-${option.value}`}>{option.label}</FormLabel>
-          </div>
-        ));
+        return (
+          <FormControl>
+            <div className="space-y-2">
+              {field.options?.map((option) => (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`${field.id}-${option.value}`}
+                    {...form.register(`${field.id}.${option.value}`)}
+                  />
+                  <FormLabel htmlFor={`${field.id}-${option.value}`}>{option.label}</FormLabel>
+                </div>
+              ))}
+            </div>
+          </FormControl>
+        );
 
       case 'select':
         return (
-          <Select
-            onValueChange={(value) => form.setValue(field.id, value)}
-            defaultValue={form.getValues(field.id)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options?.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <FormControl>
+            <Select
+              onValueChange={(value) => form.setValue(field.id, value)}
+              defaultValue={form.getValues(field.id)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+              </SelectTrigger>
+              <SelectContent>
+                {field.options?.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormControl>
         );
 
       case 'table':
         return (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {field.columns?.map((column) => (
-                  <TableHead key={column.id}>{column.label}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                {field.columns?.map((column) => (
-                  <TableCell key={column.id}>
-                    <FormField field={column} />
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableBody>
-          </Table>
+          <FormControl>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {field.columns?.map((column) => (
+                    <TableHead key={column.id}>{column.label}</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  {field.columns?.map((column) => (
+                    <TableCell key={column.id}>
+                      <FormField field={column} />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableBody>
+            </Table>
+          </FormControl>
         );
 
       case 'group':
         return (
-          <div className="space-y-4 border p-4 rounded-lg">
-            {field.groupFields?.map((groupField) => (
-              <FormField key={groupField.id} field={groupField} />
-            ))}
-          </div>
+          <FormControl>
+            <div className="space-y-4 border p-4 rounded-lg">
+              {field.groupFields?.map((groupField) => (
+                <FormField key={groupField.id} field={groupField} />
+              ))}
+            </div>
+          </FormControl>
         );
 
       default:
@@ -151,10 +173,10 @@ export default function FormField({ field }: FormFieldProps) {
     <UIFormField
       control={form.control}
       name={field.id}
-      render={() => (
+      render={({ field: formField }) => (
         <FormItem>
           <FormLabel>{field.label}</FormLabel>
-          <FormControl>{renderField()}</FormControl>
+          {renderField()}
           {field.helpText && <FormDescription>{field.helpText}</FormDescription>}
           <FormMessage />
         </FormItem>
