@@ -74,32 +74,34 @@ export default function FormRenderer({ formDefinition, formId, subjectId }: Form
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <Tabs value={activeSection} onValueChange={setActiveSection}>
-            <ScrollArea className="w-full" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-              <TabsList className="w-full flex flex-wrap">
-                {formDefinition.sections.map(section => (
-                  <TabsTrigger
-                    key={section.id}
-                    value={section.id}
-                    className="flex-grow"
-                  >
-                    {section.title}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-[calc(100vh-4rem)]">
+          <Tabs value={activeSection} onValueChange={setActiveSection} className="flex-1 flex flex-col">
+            <TabsList className="w-full flex flex-wrap sticky top-0 bg-background z-10 border-b">
               {formDefinition.sections.map(section => (
-                <TabsContent key={section.id} value={section.id}>
-                  <FormSection
-                    section={section}
-                  />
-                </TabsContent>
+                <TabsTrigger
+                  key={section.id}
+                  value={section.id}
+                  className="flex-grow"
+                >
+                  {section.title}
+                </TabsTrigger>
               ))}
-            </ScrollArea>
+            </TabsList>
+
+            <div className="flex-1 overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-12rem)] w-full px-4">
+                {formDefinition.sections.map(section => (
+                  <TabsContent key={section.id} value={section.id} className="mt-4">
+                    <FormSection
+                      section={section}
+                    />
+                  </TabsContent>
+                ))}
+              </ScrollArea>
+            </div>
           </Tabs>
 
-          <div className="flex justify-end gap-4 sticky bottom-0 bg-background p-4 border-t">
+          <div className="flex justify-end gap-4 sticky bottom-0 bg-background p-4 border-t mt-auto">
             <Button 
               type="button" 
               variant="outline"
