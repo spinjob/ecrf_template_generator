@@ -75,47 +75,53 @@ export default function FormRenderer({ formDefinition, formId, subjectId }: Form
     <FormProvider {...form}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-[calc(100vh-4rem)]">
-          {/* Left sidebar with tabs */}
-          <div className="w-64 border-r bg-muted/40">
-            <ScrollArea className="h-full">
-              <TabsList className="flex flex-col w-full h-full space-y-1 p-2">
-                {formDefinition.sections.map(section => (
-                  <TabsTrigger
-                    key={section.id}
-                    value={section.id}
-                    className="w-full justify-start px-4 py-2 text-left"
-                  >
-                    {section.title}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </ScrollArea>
-          </div>
+          {/* Main content area with tabs */}
+          <div className="flex-1 flex">
+            <Tabs 
+              value={activeSection} 
+              onValueChange={setActiveSection} 
+              orientation="vertical" 
+              className="flex flex-1"
+            >
+              {/* Left sidebar with tabs */}
+              <div className="w-64 border-r bg-muted/40">
+                <ScrollArea className="h-full">
+                  <TabsList className="flex flex-col w-full h-full space-y-1 p-2">
+                    {formDefinition.sections.map(section => (
+                      <TabsTrigger
+                        key={section.id}
+                        value={section.id}
+                        className="w-full justify-start px-4 py-2 text-left"
+                      >
+                        {section.title}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </ScrollArea>
+              </div>
 
-          {/* Main content area */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <Tabs value={activeSection} onValueChange={setActiveSection} className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-hidden">
-                <ScrollArea className="h-[calc(100vh-8rem)] w-full px-6">
+              {/* Form content area */}
+              <div className="flex-1 flex flex-col min-h-0">
+                <ScrollArea className="flex-1 w-full px-6">
                   {formDefinition.sections.map(section => (
                     <TabsContent key={section.id} value={section.id} className="mt-4">
                       <FormSection section={section} />
                     </TabsContent>
                   ))}
                 </ScrollArea>
+
+                <div className="flex justify-end gap-4 sticky bottom-0 bg-background p-4 border-t mt-auto">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => form.reset()}
+                  >
+                    Reset
+                  </Button>
+                  <Button type="submit">Submit</Button>
+                </div>
               </div>
             </Tabs>
-
-            <div className="flex justify-end gap-4 sticky bottom-0 bg-background p-4 border-t mt-auto">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={() => form.reset()}
-              >
-                Reset
-              </Button>
-              <Button type="submit">Submit</Button>
-            </div>
           </div>
         </form>
       </Form>
