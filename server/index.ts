@@ -1,11 +1,15 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { expressToVercel } from './vercel';
+import { VercelRequest, VercelResponse } from '@vercel/node';
 
+// Create Express app
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -36,9 +40,17 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+// Initialize app with all routes
+let appInstance: express.Express | null = null;
+let serverInstance: any = null;
 
+// Setup for both local development and Vercel
+const setupApp = async () => {
+  // Register API routes
+  const server = await registerRoutes(app);
+  serverInstance = server;
+
+  // Error handling middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -47,19 +59,61 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  // Check if running on Vercel or in development
+  const isVercel = process.env.VERCEL === '1';
+  const isDev = process.env.NODE_ENV === 'development';
+
+  if (isDev && !isVercel) {
+    // Development mode - setup Vite HMR
     await setupVite(app, server);
+    
+    // Start the local server
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+      log(`serving on port ${PORT}`);
+    });
+  } else if (!isDev && !isVercel) {
+    // Production mode but not on Vercel - serve static assets
+    serveStatic(app);
+    
+    // Start the local server
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+      log(`serving on port ${PORT}`);
+    });
   } else {
+    // On Vercel - serve static assets
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 3000
-  // this serves both the API and the client
-  const PORT = process.env.PORT || 3000;
-  server.listen(PORT, () => {
-    log(`serving on port ${PORT}`);
-  });
-})();
+  appInstance = app;
+  return app;
+};
+
+// Initialize the app immediately
+setupApp().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
+
+// Get the initialized app, waiting if necessary
+const getApp = async () => {
+  if (appInstance) return appInstance;
+  
+  // Wait for app to initialize if it hasn't yet
+  return setupApp();
+};
+
+// Export the Vercel handler as a named export
+export const vercelHandler = async (req: VercelRequest, res: VercelResponse) => {
+  try {
+    const app = await getApp();
+    return expressToVercel(app)(req, res);
+  } catch (error) {
+    console.error('Serverless function error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+// Also export as default for ESM compatibility
+export default vercelHandler;

@@ -1,35 +1,40 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "client/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/forms/:formId/data/:subjectId",
-      "destination": "/api/forms/[formId]/data/[subjectId].ts"
-    },
-    {
-      "source": "/api/forms/:formId/data",
-      "destination": "/api/forms/[formId]/data/index.ts"
-    },
-    {
-      "source": "/api/forms/:id",
-      "destination": "/api/forms/[id].ts"
-    },
-    {
-      "source": "/api/forms",
-      "destination": "/api/forms/index.ts"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/client/$1"
-    }
-  ]
-} 
+    "version": 2,
+    "buildCommand": "npm run vercel-build",
+    "outputDirectory": "dist/public",
+    "framework": null,
+    "routes": [
+      {
+        "src": "/api/forms/([^/]+)/data/([^/]+)",
+        "dest": "/api/_handler?path=/api/forms/$1/data/$2&formId=$1&subjectId=$2"
+      },
+      {
+        "src": "/api/forms/([^/]+)/data",
+        "dest": "/api/_handler?path=/api/forms/$1/data&formId=$1"
+      },
+      {
+        "src": "/api/forms/([^/]+)",
+        "dest": "/api/_handler?path=/api/forms/$1&id=$1"
+      },
+      {
+        "src": "/api/forms",
+        "dest": "/api/_handler?path=/api/forms"
+      },
+      {
+        "src": "/api/(.*)",
+        "dest": "/api/_handler?path=/api/$1"
+      },
+      {
+        "src": "/assets/(.*)",
+        "dest": "/assets/$1"
+      },
+      {
+        "src": "/(.*\\.(js|css|ico|png|jpg|svg))",
+        "dest": "/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ]
+  }

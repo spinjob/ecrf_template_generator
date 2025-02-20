@@ -71,18 +71,53 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(__dirname, "public");
+  // Try multiple possible build paths
+  const possiblePaths = [
+    path.resolve(__dirname, "../dist/public"),
+    path.resolve(__dirname, "../dist/client"),
+    path.resolve(__dirname, "../dist"),
+    path.resolve(process.cwd(), "dist/public"),
+    path.resolve(process.cwd(), "dist/client"),
+    path.resolve(process.cwd(), "dist"),
+    path.resolve(__dirname, "../client/dist"),
+    path.resolve(__dirname, "../public")
+  ];
+  
+  let distPath: string | null = null;
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      distPath = p;
+      log(`Found build directory at: ${distPath}`, "static");
+      break;
+    }
+  }
 
-  if (!fs.existsSync(distPath)) {
+  if (!distPath) {
+    // If running on Vercel, continue without the build directory
+    if (process.env.VERCEL === '1') {
+      log("No build directory found, but continuing because we're on Vercel", "static");
+      return;
+    }
+    
     throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+      `Could not find the build directory. Tried: ${possiblePaths.join(', ')}. Make sure to build the client first.`
     );
   }
 
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  app.use("*", (req, res, next) => {
+    // Skip API routes
+    if (req.originalUrl.startsWith("/api")) {
+      return next();
+    }
+    
+    const indexPath = path.resolve(distPath as string, "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      next(new Error(`Could not find index.html in ${distPath}`));
+    }
   });
 }
