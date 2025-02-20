@@ -1,8 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
 import { createServer } from 'http';
-import { registerRoutes } from '../server/routes';
-import { serveStatic } from '../server/vite';
+import { registerRoutes } from '../server/routes.js';
+import { serveStatic } from '../server/vite.js';
 
 // Function to create a server-to-vercel adapter
 function expressToVercel(app: express.Express) {

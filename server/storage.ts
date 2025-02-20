@@ -1,7 +1,9 @@
-import { 
-  FormDefinition, InsertFormDefinition,
-  FormData, InsertFormData
-} from "@shared/schema";
+import {
+  type FormDefinition,
+  type FormData,
+  type InsertFormDefinition,
+  type InsertFormData
+} from "../shared/schema.js";
 
 export interface IStorage {
   // Form Definition operations

@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../../../../server/storage';
-import { formDataValidationSchema } from '../../../../shared/schema';
+import { storage } from '../../../../server/storage.js';
+import { formDataValidationSchema } from '../../../../shared/schema.js';
 import { z } from 'zod';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

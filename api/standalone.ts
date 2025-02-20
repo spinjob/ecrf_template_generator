@@ -1,9 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
 import { createServer } from 'http';
-import { expressToVercel } from '../server/vercel';
-import { registerRoutes } from '../server/routes';
-import { serveStatic } from '../server/vite';
+import { expressToVercel } from '../server/vercel.js';
+import { registerRoutes } from '../server/routes.js';
+import { serveStatic } from '../server/vite.js';
 
 // This creates a standalone Express app just for Vercel
 // without depending on importing the default export from server/index

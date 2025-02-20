@@ -1,6 +1,6 @@
 // api/_debug.ts - Use this to verify module loading
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import * as serverIndex from '../server/index';
+import * as serverIndex from '../server/index.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // List all exports from server/index
