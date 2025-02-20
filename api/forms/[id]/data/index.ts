@@ -4,7 +4,7 @@ import { formDataValidationSchema } from '../../../../shared/schema';
 import { z } from 'zod';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { formId } = req.query;
+  const { id } = req.query;
   
   // Save form data
   if (req.method === 'POST') {
@@ -12,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const formData = formDataValidationSchema.parse(req.body);
       const result = await storage.saveFormData({
         ...formData,
-        formDefinitionId: parseInt(formId as string),
+        formDefinitionId: parseInt(id as string),
         lastUpdated: new Date().toISOString()
       });
       

@@ -6,23 +6,23 @@
     "routes": [
       {
         "src": "/api/forms/([^/]+)/data/([^/]+)",
-        "dest": "/api/_handler?path=/api/forms/$1/data/$2&formId=$1&subjectId=$2"
+        "dest": "/api/forms/[formId]/data/[subjectId]?formId=$1&subjectId=$2"
       },
       {
         "src": "/api/forms/([^/]+)/data",
-        "dest": "/api/_handler?path=/api/forms/$1/data&formId=$1"
+        "dest": "/api/forms/[formId]/data/index?formId=$1"
       },
       {
         "src": "/api/forms/([^/]+)",
-        "dest": "/api/_handler?path=/api/forms/$1&id=$1"
+        "dest": "/api/forms/[formId]?formId=$1"
       },
       {
         "src": "/api/forms",
-        "dest": "/api/_handler?path=/api/forms"
+        "dest": "/api/forms/index"
       },
       {
         "src": "/api/(.*)",
-        "dest": "/api/_handler?path=/api/$1"
+        "dest": "/api/standalone"
       },
       {
         "src": "/assets/(.*)",

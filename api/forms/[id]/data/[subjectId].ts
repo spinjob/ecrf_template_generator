@@ -2,12 +2,12 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { storage } from '../../../../server/storage';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { formId, subjectId } = req.query;
+  const { id, subjectId } = req.query;
   
   if (req.method === 'GET') {
     try {
       const data = await storage.getFormData(
-        parseInt(formId as string), 
+        parseInt(id as string), 
         subjectId as string
       );
       
