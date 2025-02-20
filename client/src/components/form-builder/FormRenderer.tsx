@@ -74,42 +74,48 @@ export default function FormRenderer({ formDefinition, formId, subjectId }: Form
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-[calc(100vh-4rem)]">
-          <Tabs value={activeSection} onValueChange={setActiveSection} className="flex-1 flex flex-col">
-            <TabsList className="w-full flex flex-wrap sticky top-0 bg-background z-10 border-b">
-              {formDefinition.sections.map(section => (
-                <TabsTrigger
-                  key={section.id}
-                  value={section.id}
-                  className="flex-grow"
-                >
-                  {section.title}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-12rem)] w-full px-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-[calc(100vh-4rem)]">
+          {/* Left sidebar with tabs */}
+          <div className="w-64 border-r bg-muted/40">
+            <ScrollArea className="h-full">
+              <TabsList className="flex flex-col w-full h-full space-y-1 p-2">
                 {formDefinition.sections.map(section => (
-                  <TabsContent key={section.id} value={section.id} className="mt-4">
-                    <FormSection
-                      section={section}
-                    />
-                  </TabsContent>
+                  <TabsTrigger
+                    key={section.id}
+                    value={section.id}
+                    className="w-full justify-start px-4 py-2 text-left"
+                  >
+                    {section.title}
+                  </TabsTrigger>
                 ))}
-              </ScrollArea>
-            </div>
-          </Tabs>
+              </TabsList>
+            </ScrollArea>
+          </div>
 
-          <div className="flex justify-end gap-4 sticky bottom-0 bg-background p-4 border-t mt-auto">
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={() => form.reset()}
-            >
-              Reset
-            </Button>
-            <Button type="submit">Submit</Button>
+          {/* Main content area */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <Tabs value={activeSection} onValueChange={setActiveSection} className="flex-1 flex flex-col">
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-[calc(100vh-8rem)] w-full px-6">
+                  {formDefinition.sections.map(section => (
+                    <TabsContent key={section.id} value={section.id} className="mt-4">
+                      <FormSection section={section} />
+                    </TabsContent>
+                  ))}
+                </ScrollArea>
+              </div>
+            </Tabs>
+
+            <div className="flex justify-end gap-4 sticky bottom-0 bg-background p-4 border-t mt-auto">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => form.reset()}
+              >
+                Reset
+              </Button>
+              <Button type="submit">Submit</Button>
+            </div>
           </div>
         </form>
       </Form>
