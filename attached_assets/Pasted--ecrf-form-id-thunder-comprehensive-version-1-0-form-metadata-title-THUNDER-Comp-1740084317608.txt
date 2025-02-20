@@ -1,0 +1,699 @@
+<ecrf_form id="thunder_comprehensive" version="1.0">
+    <form_metadata>
+        <title>THUNDER Comprehensive eCRF</title>
+        <description>All clinically required forms for the THUNDER protocol, incorporating screening, enrollment, treatment, follow-ups, and EPIC questionnaire. Designed to be GDPR-compliant.</description>
+        <version>1.0</version>
+        <last_modified>2025-02-20</last_modified>
+    </form_metadata>
+
+    <!-- 
+      NOTE ON GDPR COMPLIANCE:
+      This eCRF does not collect direct personal identifiers such as name or date of birth.
+      Instead it references a subject ID to ensure pseudonymization. The forms listed below 
+      are logically grouped according to the typical schedule of events and repeated visits.
+    -->
+
+    <!-- =========================================
+         1.0.0 SCREENING &amp;ENROLLMENT 
+         (Sections 1.1.0, 1.2.0, etc.)
+         ========================================= -->
+    <form_section id="1.1.0_screening_identifiers">
+        <section_title>1.1.0 Subject Identification</section_title>
+        <section_description>Capture unique subject ID and relevant anonymized identifiers for screening.</section_description>
+
+        <input_field>
+            <field_id>subject_id</field_id>
+            <label>Subject ID</label>
+            <type>text</type>
+            <required>true</required>
+            <validation>
+                <pattern>[A-Z0-9\-]+</pattern>
+                <error_message>Required: Alphanumeric with optional hyphens.</error_message>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>screening_date</field_id>
+            <label>Screening Date</label>
+            <type>date</type>
+            <required>true</required>
+            <validation>
+                <min_date>2020-01-01</min_date>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>year_of_birth</field_id>
+            <label>Year of Birth</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>1900</min>
+                <max>2100</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>informed_consent</field_id>
+            <label>Informed Consent Obtained?</label>
+            <type>radio</type>
+            <required>true</required>
+            <options>
+                <option value="Y">Yes</option>
+                <option value="N">No</option>
+            </options>
+        </input_field>
+    </form_section>
+
+    <form_section id="1.2.0_screening_eligibility">
+        <section_title>1.2.0 Screening and Eligibility</section_title>
+        <section_description>Eligibility verification based on inclusion/exclusion criteria and key lab values.</section_description>
+
+        <!-- Example: Investigator verifies subject meets protocol-specific criteria. -->
+
+        <input_field>
+            <field_id>meets_inclusion_criteria</field_id>
+            <label>All Inclusion Criteria Met?</label>
+            <type>checkbox</type>
+            <required>true</required>
+            <options>
+                <option value="histopathology_confirmed">Histopathology Confirmed PCa</option>
+                <option value="high_risk">High-Risk Criteria (PSA &gt; 20, cT3-T4, Gleason ≥8, or cN1)</option>
+                <option value="ecog_0_or_1">ECOG Performance Status 0 or 1</option>
+                <option value="psma_pet_willing">Willing to Undergo PSMA PET/CT</option>
+                <option value="decipher_test_willing">Willing to Obtain Decipher Score</option>
+                <option value="soc_rt_willing">Willing to Undergo Radiotherapy</option>
+                <option value="adt_willing">Willing to Undergo ADT (if required)</option>
+                <option value="consent_obtained">Signed Informed Consent</option>
+                <option value="gfr_30_plus">Creatinine Clearance &gt; 30 mL/min</option>
+                <option value="testosterone_50plus">Testosterone &gt; 50 ng/dL</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>exclusion_criteria</field_id>
+            <label>Exclusion Criteria Check (Select All That Apply)</label>
+            <type>checkbox</type>
+            <required>false</required>
+            <options>
+                <option value="mets_outside_pelvic_on_conventional">Definitive M1 on conventional imaging</option>
+                <option value="prior_radiotherapy">Prior Pelvic Radiotherapy</option>
+                <option value="prohibited_medications">Contraindications for ADT or PSMA Tracers</option>
+                <option value="local_therapy_done">Prior Definitive Local Therapy (RP, HIFU, Cryotherapy) for PCa</option>
+                <option value="chronic_opioids">Chronic Opioid Analgesics</option>
+                <option value="seizure_history">History of Seizure or Stroke &lt;=1 yr</option>
+                <option value="serious_cvd">Significant CV Disease within 6 months</option>
+                <option value="other_malignancy_5yr">Other Malignancy &lt;=5 yrs</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>eligibility_confirmed</field_id>
+            <label>Eligibility Confirmed by Investigator</label>
+            <type>radio</type>
+            <required>true</required>
+            <options>
+                <option value="eligible">Eligible</option>
+                <option value="ineligible">Ineligible</option>
+            </options>
+        </input_field>
+    </form_section>
+
+    <!-- ===============================
+         2.0.0 BASELINE ASSESSMENTS
+         =============================== -->
+    <form_section id="2.1.0_baseline_demographics">
+        <section_title>2.1.0 Baseline Demographics &amp;Medical History</section_title>
+        <section_description>Collected once subject is confirmed eligible. Basic demographics, prior meds, and history.</section_description>
+
+        <input_field>
+            <field_id>subject_sex</field_id>
+            <label>Sex (Assigned at Birth)</label>
+            <type>select</type>
+            <required>true</required>
+            <options>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="O">Other</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>race_ethnicity</field_id>
+            <label>Race/Ethnicity (Optional)</label>
+            <type>select</type>
+            <required>false</required>
+            <options>
+                <option value="white">White</option>
+                <option value="black">Black or African American</option>
+                <option value="asian">Asian</option>
+                <option value="latino">Hispanic/Latino</option>
+                <option value="other">Other</option>
+                <option value="prefer_not">Prefer Not to Answer</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>height_cm</field_id>
+            <label>Height (cm)</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>50</min>
+                <max>250</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>weight_kg</field_id>
+            <label>Weight (kg)</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>20</min>
+                <max>300</max>
+                <decimal_places>1</decimal_places>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>ecog_status</field_id>
+            <label>ECOG Performance Status</label>
+            <type>select</type>
+            <required>true</required>
+            <options>
+                <option value="0">0 - Fully active</option>
+                <option value="1">1 - Restricted in strenuous activity</option>
+                <option value="2">2 - Ambulatory &amp;capable of self-care</option>
+                <option value="3">3 - Limited self-care</option>
+                <option value="4">4 - Completely disabled</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>medical_history</field_id>
+            <label>Medical History (Free Text)</label>
+            <type>textarea</type>
+            <required>false</required>
+            <validation>
+                <max_length>3000</max_length>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>prior_medications</field_id>
+            <label>Prior Medications</label>
+            <type>table</type>
+            <required>false</required>
+            <columns>
+                <column>
+                    <field_id>drug_name</field_id>
+                    <label>Drug Name</label>
+                    <type>text</type>
+                </column>
+                <column>
+                    <field_id>indication</field_id>
+                    <label>Indication</label>
+                    <type>text</type>
+                </column>
+                <column>
+                    <field_id>start_date</field_id>
+                    <label>Start Date</label>
+                    <type>date</type>
+                </column>
+                <column>
+                    <field_id>end_date</field_id>
+                    <label>End Date</label>
+                    <type>date</type>
+                </column>
+            </columns>
+        </input_field>
+    </form_section>
+
+    <!-- ===============================
+         2.2.0 BASELINE LABS &amp;VITALS
+         =============================== -->
+    <form_section id="2.2.0_baseline_labs_vitals">
+        <section_title>2.2.0 Baseline Labs &amp;Vital Signs</section_title>
+        <section_description>Capture key lab results, including Hematology and Biochemistry, plus vital signs, at baseline.</section_description>
+
+        <input_field>
+            <field_id>vitals_blood_pressure</field_id>
+            <label>Blood Pressure (mmHg)</label>
+            <type>text</type>
+            <required>false</required>
+            <help_text>Format: systolic/diastolic</help_text>
+        </input_field>
+
+        <input_field>
+            <field_id>vitals_heart_rate</field_id>
+            <label>Heart Rate (bpm)</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>30</min>
+                <max>250</max>
+            </validation>
+        </input_field>
+
+        <!-- Hematology Panel -->
+        <input_field>
+            <field_id>hematology_panel</field_id>
+            <label>Hematology Panel</label>
+            <type>group</type>
+            <required>false</required>
+            <group_fields>
+                <group_field>
+                    <field_id>wbc_count</field_id>
+                    <label>White Blood Cells (x10^9/L)</label>
+                    <type>decimal</type>
+                    <required>false</required>
+                </group_field>
+                <group_field>
+                    <field_id>anc_count</field_id>
+                    <label>Absolute Neutrophil Count (x10^9/L)</label>
+                    <type>decimal</type>
+                    <required>false</required>
+                </group_field>
+                <group_field>
+                    <field_id>hemoglobin</field_id>
+                    <label>Hemoglobin (g/L)</label>
+                    <type>decimal</type>
+                    <required>false</required>
+                </group_field>
+                <group_field>
+                    <field_id>platelets</field_id>
+                    <label>Platelets (x10^9/L)</label>
+                    <type>decimal</type>
+                    <required>false</required>
+                </group_field>
+            </group_fields>
+        </input_field>
+
+        <!-- Biochemistry Panel -->
+        <input_field>
+            <field_id>biochem_panel</field_id>
+            <label>Biochemistry Panel</label>
+            <type>group</type>
+            <required>false</required>
+            <group_fields>
+                <group_field>
+                    <field_id>creatinine</field_id>
+                    <label>Creatinine (µmol/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>total_bilirubin</field_id>
+                    <label>Total Bilirubin (µmol/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>alt</field_id>
+                    <label>ALT (U/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>ast</field_id>
+                    <label>AST (U/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>ggt</field_id>
+                    <label>GGT (U/L)</label>
+                    <type>decimal</type>
+                </group_field>
+            </group_fields>
+        </input_field>
+
+        <input_field>
+            <field_id>psa_value</field_id>
+            <label>PSA (ng/mL)</label>
+            <type>decimal</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>testosterone_value</field_id>
+            <label>Testosterone (ng/dL)</label>
+            <type>decimal</type>
+            <required>false</required>
+        </input_field>
+    </form_section>
+
+    <!-- =========================================
+         3.0.0 TREATMENT FORMS (RE-USE FOR VISITS)
+         ========================================= -->
+    <form_section id="3.1.0_treatment_summary">
+        <section_title>3.1.0 Treatment Summary</section_title>
+        <section_description>High-level data about ongoing treatments. This section may be repeated or updated per visit.</section_description>
+
+        <!-- e.g., capturing assigned arm, or docetaxel usage, or ADT. -->
+        <input_field>
+            <field_id>study_arm</field_id>
+            <label>Assigned Treatment Arm</label>
+            <type>select</type>
+            <required>true</required>
+            <options>
+                <option value="phase3_darolutamide_plus_lhrha">Phase 3: Darolutamide + LHRHA</option>
+                <option value="phase3_placebo_plus_lhrha">Phase 3: Placebo + LHRHA</option>
+                <option value="phase2_darolutamide_only">Phase 2: Darolutamide Only</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>radiotherapy_start_date</field_id>
+            <label>Radiotherapy Start Date</label>
+            <type>date</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>radiotherapy_end_date</field_id>
+            <label>Radiotherapy End Date</label>
+            <type>date</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>lhrha_start_date</field_id>
+            <label>LHRHA Start Date</label>
+            <type>date</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>docetaxel_cycles</field_id>
+            <label>Docetaxel Cycles (# if applicable)</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>0</min>
+                <max>10</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>concomitant_medications</field_id>
+            <label>Concomitant Medications</label>
+            <type>table</type>
+            <required>false</required>
+            <columns>
+                <column>
+                    <field_id>cm_name</field_id>
+                    <label>Medication Name</label>
+                    <type>text</type>
+                </column>
+                <column>
+                    <field_id>cm_indication</field_id>
+                    <label>Indication</label>
+                    <type>text</type>
+                </column>
+                <column>
+                    <field_id>cm_start_date</field_id>
+                    <label>Start Date</label>
+                    <type>date</type>
+                </column>
+                <column>
+                    <field_id>cm_ongoing</field_id>
+                    <label>Is Ongoing?</label>
+                    <type>radio</type>
+                    <options>
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                    </options>
+                </column>
+                <column>
+                    <field_id>cm_end_date</field_id>
+                    <label>End Date (if known)</label>
+                    <type>date</type>
+                </column>
+            </columns>
+        </input_field>
+    </form_section>
+
+    <!-- ===========================
+         3.2.0 ADVERSE EVENT FORM
+         =========================== -->
+    <form_section id="3.2.0_adverse_event_form">
+        <section_title>3.2.0 Adverse Event Form</section_title>
+        <section_description>Log any adverse events (AEs) at each visit or as needed. May be repeated.</section_description>
+
+        <input_field>
+            <field_id>ae_table</field_id>
+            <label>Adverse Events</label>
+            <type>table</type>
+            <required>false</required>
+            <columns>
+                <column>
+                    <field_id>ae_description</field_id>
+                    <label>AE Description</label>
+                    <type>text</type>
+                </column>
+                <column>
+                    <field_id>ae_start_date</field_id>
+                    <label>Start Date</label>
+                    <type>date</type>
+                </column>
+                <column>
+                    <field_id>ae_end_date</field_id>
+                    <label>End Date</label>
+                    <type>date</type>
+                </column>
+                <column>
+                    <field_id>ae_ctc_grade</field_id>
+                    <label>NCI-CTCAE Grade</label>
+                    <type>select</type>
+                    <options>
+                        <option value="1">Grade 1</option>
+                        <option value="2">Grade 2</option>
+                        <option value="3">Grade 3</option>
+                        <option value="4">Grade 4</option>
+                        <option value="5">Grade 5</option>
+                    </options>
+                </column>
+                <column>
+                    <field_id>ae_relationship</field_id>
+                    <label>Relationship to Study Drug</label>
+                    <type>select</type>
+                    <options>
+                        <option value="not_related">Not Related</option>
+                        <option value="unlikely_related">Unlikely Related</option>
+                        <option value="possibly_related">Possibly Related</option>
+                        <option value="probably_related">Probably Related</option>
+                        <option value="definitely_related">Definitely Related</option>
+                    </options>
+                </column>
+                <column>
+                    <field_id>ae_outcome</field_id>
+                    <label>Outcome</label>
+                    <type>select</type>
+                    <options>
+                        <option value="resolved">Resolved</option>
+                        <option value="resolved_with_sequelae">Resolved with Sequelae</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="fatal">Fatal</option>
+                    </options>
+                </column>
+            </columns>
+        </input_field>
+    </form_section>
+
+    <!-- ==================================
+         4.0.0 FOLLOW-UP / REPEATED VISITS
+         ================================== -->
+    <form_section id="4.1.0_followup_lab_assessment">
+        <section_title>4.1.0 Follow-Up Laboratory &amp;PSA</section_title>
+        <section_description>Re-used at each follow-up visit to capture labs (PSA progression monitoring, etc.).</section_description>
+
+        <input_field>
+            <field_id>visit_number</field_id>
+            <label>Visit Number or Sequence</label>
+            <type>text</type>
+            <required>true</required>
+        </input_field>
+
+        <input_field>
+            <field_id>visit_date</field_id>
+            <label>Visit Date</label>
+            <type>date</type>
+            <required>true</required>
+        </input_field>
+
+        <input_field>
+            <field_id>psa_followup</field_id>
+            <label>PSA (ng/mL)</label>
+            <type>decimal</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>testosterone_followup</field_id>
+            <label>Testosterone (ng/dL)</label>
+            <type>decimal</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>hematology_followup</field_id>
+            <label>Hematology Follow-Up</label>
+            <type>group</type>
+            <required>false</required>
+            <group_fields>
+                <group_field>
+                    <field_id>hemoglobin_followup</field_id>
+                    <label>Hemoglobin (g/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>wbc_followup</field_id>
+                    <label>WBC (x10^9/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>platelets_followup</field_id>
+                    <label>Platelets (x10^9/L)</label>
+                    <type>decimal</type>
+                </group_field>
+            </group_fields>
+        </input_field>
+
+        <input_field>
+            <field_id>biochemistry_followup</field_id>
+            <label>Biochemistry Follow-Up</label>
+            <type>group</type>
+            <required>false</required>
+            <group_fields>
+                <group_field>
+                    <field_id>creatinine_followup</field_id>
+                    <label>Creatinine (µmol/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>total_bilirubin_followup</field_id>
+                    <label>Total Bilirubin (µmol/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>alt_followup</field_id>
+                    <label>ALT (U/L)</label>
+                    <type>decimal</type>
+                </group_field>
+                <group_field>
+                    <field_id>ast_followup</field_id>
+                    <label>AST (U/L)</label>
+                    <type>decimal</type>
+                </group_field>
+            </group_fields>
+        </input_field>
+    </form_section>
+
+    <form_section id="4.2.0_epic_questionnaire">
+        <section_title>4.2.0 EPIC Questionnaire</section_title>
+        <section_description>Expanded Prostate Cancer Index Composite - high-level summary scores. Collect at designated intervals.</section_description>
+
+        <!-- For more detailed questions, typically we have 50 or so items in the official EPIC-50 or EPIC-26. 
+             The user requested "high level section scores" as input. So we assume the site calculates subdomain scores. -->
+
+        <input_field>
+            <field_id>epic_urinary_score</field_id>
+            <label>EPIC Urinary Summary Score</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>0</min>
+                <max>100</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>epic_bowel_score</field_id>
+            <label>EPIC Bowel Summary Score</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>0</min>
+                <max>100</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>epic_sexual_score</field_id>
+            <label>EPIC Sexual Summary Score</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>0</min>
+                <max>100</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>epic_hormonal_score</field_id>
+            <label>EPIC Hormonal Summary Score</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>0</min>
+                <max>100</max>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>epic_overall_score</field_id>
+            <label>EPIC Overall Score</label>
+            <type>number</type>
+            <required>false</required>
+            <validation>
+                <min>0</min>
+                <max>100</max>
+            </validation>
+        </input_field>
+    </form_section>
+
+    <!-- ==========================
+         5.0.0 STUDY COMPLETION 
+         ========================== -->
+    <form_section id="5.0.0_study_completion">
+        <section_title>5.0.0 Study Completion</section_title>
+        <section_description>Final form to close out the subject's participation in the THUNDER study.</section_description>
+
+        <input_field>
+            <field_id>completion_status</field_id>
+            <label>Completion Status</label>
+            <type>radio</type>
+            <required>true</required>
+            <options>
+                <option value="completed">Completed as per protocol</option>
+                <option value="withdrawn">Withdrawn</option>
+                <option value="lost_to_follow_up">Lost to Follow-up</option>
+                <option value="death">Death</option>
+                <option value="other">Other</option>
+            </options>
+        </input_field>
+
+        <input_field>
+            <field_id>date_of_completion</field_id>
+            <label>Date of Completion/Withdrawal</label>
+            <type>date</type>
+            <required>false</required>
+        </input_field>
+
+        <input_field>
+            <field_id>completion_notes</field_id>
+            <label>Completion Notes / Reason for Withdrawal</label>
+            <type>textarea</type>
+            <required>false</required>
+            <validation>
+                <max_length>2000</max_length>
+            </validation>
+        </input_field>
+
+        <input_field>
+            <field_id>investigator_signature</field_id>
+            <label>Investigator Signature</label>
+            <type>signature</type>
+            <required>true</required>
+        </input_field>
+    </form_section>
+
+</ecrf_form>
