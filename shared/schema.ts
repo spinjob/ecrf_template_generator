@@ -19,7 +19,12 @@ export const formData = pgTable("form_data", {
   lastUpdated: text("last_updated").notNull(),
 });
 
-export const insertFormDefinitionSchema = createInsertSchema(formDefinitions);
+// Modified to ensure version is converted to string
+export const insertFormDefinitionSchema = createInsertSchema(formDefinitions).transform((data) => ({
+  ...data,
+  version: String(data.version), // Ensure version is a string
+}));
+
 export const insertFormDataSchema = createInsertSchema(formData);
 
 export type FormDefinition = typeof formDefinitions.$inferSelect;

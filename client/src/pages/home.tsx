@@ -26,7 +26,7 @@ export default function Home() {
       // Create form definition
       const response = await apiRequest('POST', '/api/forms', {
         title: parsedForm.title,
-        version: parsedForm.version,
+        version: String(parsedForm.version), // Ensure version is a string
         xmlContent,
       });
 
