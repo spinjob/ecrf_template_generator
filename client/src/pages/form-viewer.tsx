@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
-import { CopyIcon, CheckIcon, InfoCircledIcon, FileIcon } from '@radix-ui/react-icons';
+import { CopyIcon, CheckIcon, InfoCircledIcon, FileIcon, ChevronDownIcon } from '@radix-ui/react-icons';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const promptText = `<meta prompt 1 = "ecrf format">
 <meta_prompt>
@@ -235,6 +240,7 @@ export default function FormViewer() {
   const [xmlInput, setXmlInput] = React.useState(defaultFormXml);
   const [isEditing, setIsEditing] = React.useState(true);
   const [isCopied, setIsCopied] = React.useState(false);
+  const [isInstructionsOpen, setIsInstructionsOpen] = React.useState(false);
   const { toast } = useToast();
 
   const handleRenderForm = () => {
@@ -272,41 +278,60 @@ export default function FormViewer() {
     return (
       <div className="container mx-auto py-8 space-y-8">
         <h1 className="text-3xl font-bold">eCRF Generator Prototype</h1>
-        <Card className="p-6 space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <InfoCircledIcon className="h-4 w-4" />
-              <h2 className="text-xl font-semibold">Instructions</h2>
-            </div>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li>Open <a href="https://chat.openai.com" className="text-blue-600 hover:underline">chat.openai.com</a> and select the "o1" model</li>
-              <li>Add a PDF or other file that describes the Protocol you want to generate an eCRF for</li>
-              <li>Copy the prompt below and paste it into the chat</li>
-              <li>Once ChatGPT has returned the XML, copy the XML and paste it into the XML Form Editor below</li>
-              <li>Click the "Render Form" button to see the form</li>
-            </ol>
-          </div>
+        
+        <Collapsible
+          open={isInstructionsOpen}
+          onOpenChange={setIsInstructionsOpen}
+          className="w-full"
+        >
+          <Card className="border p-4">
+            <CollapsibleTrigger className="flex items-center justify-between w-full">
+              <div className="flex items-center space-x-2">
+                <InfoCircledIcon className="h-4 w-4" />
+                <h2 className="text-xl font-semibold">Instructions</h2>
+              </div>
+              <ChevronDownIcon className={`h-4 w-4 transition-transform duration-200 ${isInstructionsOpen ? 'transform rotate-180' : ''}`} />
+            </CollapsibleTrigger>
 
-          <div className="relative space-y-2 pt-4">
-            <div className="flex items-center space-x-2">
-              <FileIcon className="h-4 w-4" />
-              <h2 className="text-lg font-semibold">Prompt (copy and paste with protocol attached as file)</h2>
-            </div>
-            <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap">{promptText}</pre>
-            <Button
-              variant="outline"
-              size="sm"
-              className="absolute top-2 right-2"
-              onClick={handleCopyPrompt}
-            >
-              {isCopied ? (
-                <CheckIcon className="h-4 w-4" />
-              ) : (
-                <CopyIcon className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        </Card>
+            <CollapsibleContent className="pt-4">
+              <div className="space-y-4">
+                <ol className="list-decimal list-inside space-y-2 ml-4">
+                  <li>Open <a href="https://chat.openai.com" className="text-blue-600 hover:underline">chat.openai.com</a> and select the "o1" model</li>
+                  <li>Add a PDF or other file that describes the Protocol you want to generate an eCRF for</li>
+                  <li>Copy the prompt below and paste it into the chat</li>
+                  <li>Once ChatGPT has returned the XML, copy the XML and paste it into the XML Form Editor below</li>
+                  <li>Click the "Render Form" button to see the form</li>
+                </ol>
+
+                <div className="relative space-y-2 pt-4">
+                  <div className="flex items-center space-x-2">
+                    <FileIcon className="h-4 w-4" />
+                    <h2 className="text-lg font-semibold">Prompt (copy and paste with protocol attached as file)</h2>
+                  </div>
+                  <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap">{promptText}</pre>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="absolute top-2 right-2 bottom-2"
+                    onClick={handleCopyPrompt}
+                  >
+                    {isCopied ? (
+                      <div className="flex items-center space-x-2">
+                        <p className="text-xs">Copied!</p>
+                        <CheckIcon className="h-4 w-4" />
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <p className="text-xs">Copy Prompt</p>
+                        <CopyIcon className="h-4 w-4" />
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         <Card className="border-2">
           <div className="border-b p-4 bg-muted/30">
