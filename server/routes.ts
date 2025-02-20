@@ -14,6 +14,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         res.status(400).json({ error: error.errors });
       } else {
+        console.error('Form creation error:', error);
         res.status(500).json({ error: 'Failed to create form definition' });
       }
     }
@@ -42,6 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         res.status(400).json({ error: error.errors });
       } else {
+        console.error('Form data save error:', error);
         res.status(500).json({ error: 'Failed to save form data' });
       }
     }

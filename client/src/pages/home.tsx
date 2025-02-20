@@ -19,6 +19,10 @@ export default function Home() {
       // Validate XML by parsing it
       const parsedForm = parseECRFXml(xmlContent);
 
+      if (!parsedForm.title || !parsedForm.version) {
+        throw new Error('XML must include title and version in form_metadata');
+      }
+
       // Create form definition
       const response = await apiRequest('POST', '/api/forms', {
         title: parsedForm.title,
