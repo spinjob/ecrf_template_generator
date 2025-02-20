@@ -34,38 +34,10 @@ export default function FormViewer() {
 
   const parsedForm = parseECRFXml(formDef.xmlContent);
 
-  if (!subjectId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Card className="w-full max-w-md mx-4">
-          <CardHeader>
-            <CardTitle>{parsedForm.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Enter Subject ID</label>
-              <Input
-                value={subjectId}
-                onChange={(e) => setSubjectId(e.target.value)}
-                placeholder="e.g., SUBJ-001"
-              />
-            </div>
-            <Button 
-              className="w-full"
-              disabled={!subjectId}
-              onClick={() => setSubjectId(subjectId)}
-            >
-              Start Form
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto py-8">
       <FormRenderer
+        title={parsedForm.title}
         formDefinition={parsedForm}
         formId={parseInt(id)}
         subjectId={subjectId}

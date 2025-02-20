@@ -16,9 +16,10 @@ interface FormRendererProps {
   formDefinition: FormDefinition;
   formId: number;
   subjectId?: string;
+  title?: string;
 }
 
-export default function FormRenderer({ formDefinition, formId, subjectId }: FormRendererProps) {
+export default function FormRenderer({ formDefinition, formId, subjectId, title }: FormRendererProps) {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = React.useState(formDefinition.sections[0].id);
 
@@ -84,9 +85,16 @@ export default function FormRenderer({ formDefinition, formId, subjectId }: Form
               className="flex flex-1"
             >
               {/* Left sidebar with tabs */}
-              <div className="w-64 border-r bg-muted/40">
+              <div className="w-64 h-full">
+                <div className="w-64 border-r bg-muted/40 rounded-t-lg">
+                  {title && (
+                      <div className="p-4 border-b">
+                        <h2 className="font-bold text-lg">{title}</h2>
+                      </div>
+                    )}
+                </div>
                 <ScrollArea className="h-full">
-                  <TabsList className="flex flex-col w-full h-full space-y-1 p-2">
+                  <TabsList className="flex flex-col w-full h-full space-y-1 p-2 justify-start">
                     {formDefinition.sections.map(section => (
                       <TabsTrigger
                         key={section.id}
