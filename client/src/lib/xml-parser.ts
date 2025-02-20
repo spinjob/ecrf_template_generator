@@ -26,6 +26,8 @@ export interface FormField {
   helpText?: string;
   columns?: FormField[];
   groupFields?: FormField[];
+  components?: FormField[];
+  defaultValue?: string;
 }
 
 export interface FormSection {
@@ -63,54 +65,81 @@ interface XMLFormField {
   label: string;
   type: string;
   required: string;
-  validation?: ValidationRule;
+  validation?: {
+    pattern?: string;
+    min?: number;
+    max?: number;
+    minDate?: string;
+    maxDate?: string;
+    error_message?: string;
+    maxLength?: number;
+    decimal_places?: number;
+  };
   options?: {
     option: Array<{ "@_value": string; text: string }> | { "@_value": string; text: string };
   };
   help_text?: string;
   columns?: { column: XMLFormField[] };
   group_fields?: { group_field: XMLFormField[] };
+  components?: {
+    component: XMLFormField | XMLFormField[];
+  };
+  default_value?: string;
 }
 
 interface XMLForm {
   "@_id": string;
+  "@_version"?: string;
   form_metadata: FormMetadata;
   form_section: XMLFormSection | XMLFormSection[];
 }
 
 export function parseECRFXml(xmlContent: string): FormDefinition {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "@_",
-    textNodeName: "text",
-    parseAttributeValue: true,
-  });
+  try {
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: "@_",
+      textNodeName: "text",
+      parseAttributeValue: true,
+      trimValues: true,
+    });
 
-  const parsed = parser.parse(xmlContent);
-  const form = parsed.ecrf_form as XMLForm;
+    const parsed = parser.parse(xmlContent);
+    console.log('Parsed XML:', JSON.stringify(parsed, null, 2));
 
-  const formDef: FormDefinition = {
-    id: form["@_id"],
-    title: form.form_metadata.title,
-    description: form.form_metadata.description,
-    version: form.form_metadata.version,
-    lastModified: form.form_metadata.last_modified,
-    sections: [],
-  };
+    if (!parsed.ecrf_form) {
+      throw new Error('XML must have ecrf_form as root element');
+    }
 
-  // Parse sections
-  const sections = Array.isArray(form.form_section) 
-    ? form.form_section 
-    : [form.form_section];
+    const form = parsed.ecrf_form as XMLForm;
 
-  formDef.sections = sections.map((section: XMLFormSection) => ({
-    id: section["@_id"],
-    title: section.section_title,
-    description: section.section_description,
-    fields: parseFields(section.input_field),
-  }));
+    const formDef: FormDefinition = {
+      id: form["@_id"],
+      title: form.form_metadata.title,
+      description: form.form_metadata.description,
+      version: form["@_version"] || form.form_metadata.version,
+      lastModified: form.form_metadata.last_modified,
+      sections: [],
+    };
 
-  return formDef;
+    // Parse sections
+    const sections = Array.isArray(form.form_section) 
+      ? form.form_section 
+      : [form.form_section];
+
+    formDef.sections = sections.map((section: XMLFormSection) => ({
+      id: section["@_id"],
+      title: section.section_title,
+      description: section.section_description,
+      fields: parseFields(section.input_field),
+    }));
+
+    return formDef;
+  } catch (error) {
+    console.error('Error parsing XML:', error);
+    console.error('XML Content:', xmlContent);
+    throw error;
+  }
 }
 
 function parseFields(fields: XMLFormField | XMLFormField[]): FormField[] {
@@ -128,10 +157,12 @@ function parseFields(fields: XMLFormField | XMLFormField[]): FormField[] {
     helpText: field.help_text,
     columns: field.columns ? parseFields(field.columns.column) : undefined,
     groupFields: field.group_fields ? parseFields(field.group_fields.group_field) : undefined,
+    components: field.components ? parseFields(field.components.component) : undefined,
+    defaultValue: field.default_value,
   }));
 }
 
-function parseValidation(validation: ValidationRule | undefined): ValidationRule | undefined {
+function parseValidation(validation: XMLFormField['validation']): ValidationRule | undefined {
   if (!validation) return undefined;
 
   return {
@@ -140,9 +171,9 @@ function parseValidation(validation: ValidationRule | undefined): ValidationRule
     max: validation.max,
     minDate: validation.minDate,
     maxDate: validation.maxDate,
-    errorMessage: validation.errorMessage,
+    errorMessage: validation.error_message,
     maxLength: validation.maxLength,
-    decimalPlaces: validation.decimalPlaces,
+    decimalPlaces: validation.decimal_places,
   };
 }
 

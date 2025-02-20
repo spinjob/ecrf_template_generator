@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FormDefinition, FormField } from '@/lib/xml-parser';
+import { FormDefinition } from '@/lib/xml-parser';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -10,18 +10,15 @@ import FormSection from './FormSection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { createFieldValidation } from './ValidationRules';
-import { useFormData } from '@/contexts/FormDataContext';
 
 interface FormRendererProps {
   formDefinition: FormDefinition;
   formId: number;
-  subjectId?: string;
   title?: string;
 }
 
-export default function FormRenderer({ formDefinition, formId, subjectId, title }: FormRendererProps) {
+export default function FormRenderer({ formDefinition, formId, title }: FormRendererProps) {
   const { toast } = useToast();
-  const { saveFormData } = useFormData();
   const [activeSection, setActiveSection] = React.useState(formDefinition.sections[0].id);
 
   // Create dynamic validation schema based on form definition
@@ -44,32 +41,17 @@ export default function FormRenderer({ formDefinition, formId, subjectId, title 
 
   const onSubmit = async (data: Record<string, unknown>) => {
     try {
-      if (!subjectId) {
-        toast({
-          title: "Error",
-          description: "Subject ID is required",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      saveFormData({
-        formDefinitionId: formId,
-        subjectId,
-        sectionId: activeSection,
-        data,
-        isDraft: false,
-        lastUpdated: new Date().toISOString()
-      });
-
+      // Log form data to console
+      console.log('Form submitted with data:', data);
+      
       toast({
         title: "Success",
-        description: "Form data saved successfully",
+        description: "Form data logged to console",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save form data",
+        description: "Failed to process form data",
         variant: "destructive",
       });
     }
