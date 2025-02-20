@@ -4,6 +4,32 @@ import FormRenderer from '@/components/form-builder/FormRenderer';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Card } from '@/components/ui/card';
+import { CopyIcon, CheckIcon, InfoCircledIcon, FileIcon } from '@radix-ui/react-icons';
+
+const promptText = `<meta prompt 1 = "ecrf format">
+<meta_prompt>
+You will respond with 1 XML Section representing the electronic Case Report Form generated from the user instructions.
+
+Here are some notes on how you should respond in the XML section:
+- Respond with the XML and nothing else.
+- I am going to copy/paste that entire XML section into a parser to automatically apply the changes you made, so put the XML code block inside a markdown codeblock.
+
+Here is how you should structure the XML:
+<code_changes>
+    <changed_files>
+        <file>
+            <file_summary>Created eCRF form structure with multiple sections and input types</file_summary>
+            <file_operation>CREATE</file_operation>
+            <file_path>/forms/patient_enrollment.xml</file_path>
+            <file_code><![CDATA[
+__XML HERE__
+]]></file_code>
+        </file>
+    </changed_files>
+</code_changes>
+</meta_prompt>
+</meta prompt 1>`;
 
 // The default form XML
 const defaultFormXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -208,6 +234,7 @@ const defaultFormXml = `<?xml version="1.0" encoding="UTF-8"?>
 export default function FormViewer() {
   const [xmlInput, setXmlInput] = React.useState(defaultFormXml);
   const [isEditing, setIsEditing] = React.useState(true);
+  const [isCopied, setIsCopied] = React.useState(false);
   const { toast } = useToast();
 
   const handleRenderForm = () => {
@@ -223,29 +250,93 @@ export default function FormViewer() {
     }
   };
 
+  const handleCopyPrompt = async () => {
+    try {
+      await navigator.clipboard.writeText(promptText);
+      setIsCopied(true);
+      toast({
+        title: "Success",
+        description: "Prompt copied to clipboard!",
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy prompt",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isEditing) {
     return (
-      <div className="container mx-auto py-8 space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">XML Form Editor</h1>
-          <div className="space-x-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setXmlInput(defaultFormXml)}
+      <div className="container mx-auto py-8 space-y-8">
+        <h1 className="text-3xl font-bold">eCRF Generator Prototype</h1>
+        <Card className="p-6 space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <InfoCircledIcon className="h-4 w-4" />
+              <h2 className="text-xl font-semibold">Instructions</h2>
+            </div>
+            <ol className="list-decimal list-inside space-y-2 ml-4">
+              <li>Open <a href="https://chat.openai.com" className="text-blue-600 hover:underline">chat.openai.com</a> and select the "o1" model</li>
+              <li>Add a PDF or other file that describes the Protocol you want to generate an eCRF for</li>
+              <li>Copy the prompt below and paste it into the chat</li>
+              <li>Once ChatGPT has returned the XML, copy the XML and paste it into the XML Form Editor below</li>
+              <li>Click the "Render Form" button to see the form</li>
+            </ol>
+          </div>
+
+          <div className="relative space-y-2 pt-4">
+            <div className="flex items-center space-x-2">
+              <FileIcon className="h-4 w-4" />
+              <h2 className="text-lg font-semibold">Prompt (copy and paste with protocol attached as file)</h2>
+            </div>
+            <pre className="bg-muted p-4 rounded-lg text-sm whitespace-pre-wrap">{promptText}</pre>
+            <Button
+              variant="outline"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={handleCopyPrompt}
             >
-              Load Example
-            </Button>
-            <Button onClick={handleRenderForm}>
-              Render Form
+              {isCopied ? (
+                <CheckIcon className="h-4 w-4" />
+              ) : (
+                <CopyIcon className="h-4 w-4" />
+              )}
             </Button>
           </div>
-        </div>
-        <Textarea
-          value={xmlInput}
-          onChange={(e) => setXmlInput(e.target.value)}
-          className="min-h-[600px] font-mono"
-          placeholder="Paste your XML form definition here..."
-        />
+        </Card>
+
+        <Card className="border-2">
+          <div className="border-b p-4 bg-muted/30">
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col items-start space-y-2">
+                <h2 className="text-xl font-semibold">XML Form Definition</h2>
+                <p className="text-sm text-muted-foreground">Paste the ChatGPT generated XML form definition here...</p>
+              </div>
+              <div className="space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setXmlInput(defaultFormXml)}
+                >
+                  Load Example
+                </Button>
+                <Button onClick={handleRenderForm}>
+                  Render Form
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="p-4">
+            <Textarea
+              value={xmlInput}
+              onChange={(e) => setXmlInput(e.target.value)}
+              className="min-h-[600px] font-mono"
+              placeholder="Paste your XML form definition here..."
+            />
+          </div>
+        </Card>
       </div>
     );
   }
