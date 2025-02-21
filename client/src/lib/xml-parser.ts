@@ -35,6 +35,7 @@ export interface FormSection {
   title: string;
   description: string;
   fields: FormField[];
+  subSections?: FormSection[];
 }
 
 export interface FormDefinition {
@@ -57,7 +58,8 @@ interface XMLFormSection {
   "@_id": string;
   section_title: string;
   section_description: string;
-  input_field: XMLFormField | XMLFormField[];
+  input_field?: XMLFormField | XMLFormField[];
+  sub_section?: XMLFormSection | XMLFormSection[];
 }
 
 interface XMLFormField {
@@ -94,6 +96,25 @@ interface XMLForm {
   form_section: XMLFormSection | XMLFormSection[];
 }
 
+function parseSection(section: XMLFormSection): FormSection {
+  const formSection: FormSection = {
+    id: section["@_id"],
+    title: section.section_title,
+    description: section.section_description,
+    fields: section.input_field ? parseFields(section.input_field) : [],
+  };
+
+  // Handle sub-sections if they exist
+  if (section.sub_section) {
+    const subSections = Array.isArray(section.sub_section) 
+      ? section.sub_section 
+      : [section.sub_section];
+    formSection.subSections = subSections.map(parseSection);
+  }
+
+  return formSection;
+}
+
 export function parseECRFXml(xmlContent: string): FormDefinition {
   try {
     const parser = new XMLParser({
@@ -127,12 +148,7 @@ export function parseECRFXml(xmlContent: string): FormDefinition {
       ? form.form_section 
       : [form.form_section];
 
-    formDef.sections = sections.map((section: XMLFormSection) => ({
-      id: section["@_id"],
-      title: section.section_title,
-      description: section.section_description,
-      fields: parseFields(section.input_field),
-    }));
+    formDef.sections = sections.map(parseSection);
 
     return formDef;
   } catch (error) {
@@ -143,6 +159,8 @@ export function parseECRFXml(xmlContent: string): FormDefinition {
 }
 
 function parseFields(fields: XMLFormField | XMLFormField[]): FormField[] {
+  if (!fields) return [];
+  
   if (!Array.isArray(fields)) {
     fields = [fields];
   }
